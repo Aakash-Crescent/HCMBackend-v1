@@ -20,7 +20,10 @@ export const createContract = async (req: Request, res: Response) => {
 
     res.status(201).json(contract);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "Contract title must be unique" });
+    }
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -56,7 +59,7 @@ export const updateContract = async (req: Request, res: Response) => {
       type: "edited",
       title: "Contract Updated",
       description: `Contract "${contract.title}" was updated.`,
-      user: req.body.updatedBy, // frontend should pass user id
+      user: req.body.user, // frontend should pass user id
       timestamp: new Date(),
     });
     await log.save();
@@ -78,7 +81,7 @@ export const deleteContract = async (req: Request, res: Response) => {
       type: "terminated",
       title: "Contract Deleted",
       description: `Contract "${contract.title}" was deleted.`,
-      user: req.body.userId, // who deleted it
+      user: req.body.user, // who deleted it
       timestamp: new Date(),
     });
     await log.save();

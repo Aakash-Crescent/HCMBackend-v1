@@ -18,7 +18,7 @@ export interface IContract extends Document {
 
 const contractSchema = new Schema<IContract>(
   {
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true, trim: true },
     vendor: { type: String, required: true },
     value: { type: Number, required: true },
     status: {
