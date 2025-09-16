@@ -21,6 +21,7 @@ export const createContract = async (req: Request, res: Response) => {
 
     res.status(201).json(contract);
   } catch (err: any) {
+    console.log(err.message);
     res.status(400).json({ error: err.message });
   }
 };
