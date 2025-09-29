@@ -2,33 +2,30 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IContract extends Document {
   // Hospital Details
-  hospitalName: string;
-  hospitalAddress: string;
+  tenderTitle: string;
+  tenderId: string;
   country: string;
-  city: string;
-  postalCode: string;
+  region: string;
   contactPerson: string;
   email: string;
   phone: string;
-  hospitalType: string;
-  bedCapacity: number;
 
   // Medicines
   medicines: {
-    name: string;
-    category: string;
+    code: string;
+    desc: string;
     quantity: number;
-    unit: string;
+    livery: string;
     pricePerUnit: number;
-    description?: string;
+    description: string;
+    status: "active" | "terminated";
   }[];
 
   // Contract Terms
   startDate: Date;
   endDate: Date;
-  contractValue: number;
-  paymentTerms: string;
-  deliverySchedule: string;
+  tenderValue: number;
+  demandFrequency: string;
 
   // Stakeholders
   stakeholders: {
@@ -39,11 +36,10 @@ export interface IContract extends Document {
   }[];
 
   // Other Terms
-  specialTerms?: string;
-  renewalOption: boolean;
+  specialTerms?: string; //
 
   // Metadata
-  status: "draft" | "active" | "expired" | "pending";
+  status: "active" | "upcoming" | "expired" | "draft" | "terminated";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,35 +47,36 @@ export interface IContract extends Document {
 const ContractSchema = new Schema<IContract>(
   {
     // Hospital
-    hospitalName: { type: String, required: true },
-    hospitalAddress: { type: String, required: true },
+    tenderTitle: { type: String, required: true },
+    tenderId: { type: String, required: true },
     country: { type: String, required: true },
-    city: { type: String, required: true },
-    postalCode: { type: String, required: true },
+    region: { type: String, required: true },
     contactPerson: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
-    hospitalType: { type: String, required: true },
-    bedCapacity: { type: Number, required: true },
 
     // Medicines
     medicines: [
       {
-        name: { type: String, required: true },
-        category: { type: String, required: true },
+        code: { type: String, required: true },
+        desc: { type: String, required: true },
         quantity: { type: Number, required: true },
-        unit: { type: String, required: true },
+        livery: { type: String, required: true },
         pricePerUnit: { type: Number, required: true },
         description: { type: String },
+        status: {
+          type: String,
+          enum: ["active", "terminated"],
+          default: "active",
+        },
       },
     ],
 
     // Contract Terms
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    contractValue: { type: Number, required: true },
-    paymentTerms: { type: String, required: true },
-    deliverySchedule: { type: String, required: true },
+    tenderValue: { type: Number, required: true },
+    demandFrequency: { type: String, required: true },
 
     // Stakeholders
     stakeholders: [
@@ -93,7 +90,6 @@ const ContractSchema = new Schema<IContract>(
 
     // Other Terms
     specialTerms: { type: String },
-    renewalOption: { type: Boolean, required: true },
 
     // Metadata
     status: {

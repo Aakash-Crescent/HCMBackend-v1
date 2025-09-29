@@ -13,7 +13,7 @@ export const createContract = async (req: Request, res: Response) => {
       contractId: contract._id,
       type: "created",
       title: "Contract Created",
-      description: `Contract for hospital "${contract.hospitalName}" was created.`,
+      description: `Contract for hospital "${contract.tenderTitle}" was created.`,
       user: req.body.user || "system", // frontend should ideally pass logged-in user
       timestamp: new Date(),
     });
@@ -61,7 +61,7 @@ export const updateContract = async (req: Request, res: Response) => {
       contractId: contract._id,
       type: "edited",
       title: "Contract Updated",
-      description: `Contract for hospital "${contract.hospitalName}" was updated.`,
+      description: `Contract for hospital "${contract.tenderTitle}" was updated.`,
       user: req.body.user || "system",
       timestamp: new Date(),
     });
@@ -84,7 +84,7 @@ export const deleteContract = async (req: Request, res: Response) => {
       contractId: contract._id,
       type: "terminated",
       title: "Contract Deleted",
-      description: `Contract for hospital "${contract.hospitalName}" was deleted.`,
+      description: `Contract for hospital "${contract.tenderTitle}" was deleted.`,
       user: req.body.user || "system",
       timestamp: new Date(),
     });
