@@ -94,8 +94,8 @@ const ContractSchema = new Schema<IContract>(
     // Metadata
     status: {
       type: String,
-      enum: ["draft", "active", "expired", "pending"],
-      default: "draft",
+      enum: ["active", "upcoming", "expired", "draft", "terminated"],
+      default: "active",
     },
   },
   { timestamps: true }
