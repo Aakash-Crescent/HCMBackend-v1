@@ -5,7 +5,10 @@ import ActivityLog from "../models/ActivityLog";
 // CREATE CONTRACT
 export const createContract = async (req: Request, res: Response) => {
   try {
-    const contract = new Contract(req.body);
+    const contractData = req.body;
+    contractData.originalEndDate = contractData.endDate;
+
+    const contract = new Contract(contractData);
     await contract.save();
 
     // Log activity

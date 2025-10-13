@@ -24,6 +24,7 @@ export interface IContract extends Document {
   // Contract Terms
   startDate: Date;
   endDate: Date;
+  originalEndDate: Date;
   tenderValue: number;
   demandFrequency: string;
 
@@ -75,6 +76,7 @@ const ContractSchema = new Schema<IContract>(
     // Contract Terms
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
+    originalEndDate: { type: Date, required: true },
     tenderValue: { type: Number, required: true },
     demandFrequency: { type: String, required: true },
 
