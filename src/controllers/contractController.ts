@@ -8,6 +8,25 @@ export const createContract = async (req: Request, res: Response) => {
     const contractData = req.body;
     contractData.originalEndDate = contractData.endDate;
 
+    // 🧠 Determine initial status based on start/end dates
+    const today = new Date();
+    const startDate = new Date(contractData.startDate);
+    const endDate = new Date(contractData.endDate);
+
+    let initialStatus: "active" | "upcoming" | "expired" = "upcoming";
+
+    if (startDate <= today && endDate >= today) {
+      initialStatus = "active"; // 👉 Current date is between start and end
+    } else if (endDate < today) {
+      initialStatus = "expired"; // 👉 End date has already passed
+    } else if (today < startDate) {
+      initialStatus = "upcoming"; // 👉 Start date is in the future
+    }
+
+    contractData.status = initialStatus;
+    contractData.createdAt = new Date();
+    contractData.updatedAt = new Date();
+
     const contract = new Contract(contractData);
     await contract.save();
 
