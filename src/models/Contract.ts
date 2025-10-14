@@ -49,7 +49,7 @@ const ContractSchema = new Schema<IContract>(
   {
     // Hospital
     tenderTitle: { type: String, required: true },
-    tenderId: { type: String, required: true },
+    tenderId: { type: String, required: true, unique: true },
     country: { type: String, required: true },
     region: { type: String, required: true },
     contactPerson: { type: String, required: true },

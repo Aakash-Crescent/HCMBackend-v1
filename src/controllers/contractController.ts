@@ -2,6 +2,34 @@ import { Request, Response } from "express";
 import Contract from "../models/Contract";
 import ActivityLog from "../models/ActivityLog";
 
+// CHECK FOR DUPLICATE TENDER
+export const checkTenderId = async (req: Request, res: Response) => {
+  try {
+    const { tenderId } = req.params;
+    const { excludeId } = req.query; // optional
+
+    if (!tenderId || !tenderId.trim()) {
+      return res.status(400).json({ error: "tenderId is required" });
+    }
+
+    // escape regex to avoid special char issues
+    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`^${escapeRegex(tenderId.trim())}$`, "i"); // exact, case-insensitive
+
+    const query: any = { tenderId: regex };
+    if (excludeId) {
+      query._id = { $ne: excludeId as string };
+    }
+
+    const existing = await Contract.findOne(query).select("_id tenderId").lean();
+
+    return res.status(200).json({ exists: !!existing });
+  } catch (err) {
+    console.error("checkTenderId error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 // CREATE CONTRACT
 export const createContract = async (req: Request, res: Response) => {
   try {
@@ -44,6 +72,14 @@ export const createContract = async (req: Request, res: Response) => {
     res.status(201).json(contract);
   } catch (err: any) {
     console.log(err.message);
+    // 🧠 Check for MongoDB duplicate key error
+    if (err.code === 11000 && err.keyPattern?.tenderId) {
+      return res.status(400).json({
+        error:
+          "A contract with this Tender ID already exists. Please use a unique Tender ID.",
+      });
+    }
+
     res.status(400).json({ error: err.message });
   }
 };
