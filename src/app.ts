@@ -8,7 +8,12 @@ import authRoutes from "./routes/authRoutes";
 const app = express();
 
 // Middleware
-app.use(cors())
+app.use(
+  cors({
+    origin: "http://localhost:3000", // frontend URL
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -21,7 +26,7 @@ app.use("/api/auth", authRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
-    res.send("Backend Server is Running");
+  res.send("Backend Server is Running");
 });
 
 export default app;
