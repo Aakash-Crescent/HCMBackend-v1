@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IActivityLog extends Document {
-  contractId: mongoose.Types.ObjectId;
-  type: "created" | "edited" | "activated" | "terminated" | "extended" | "payment" | "reminder";
+  tenderId: mongoose.Types.ObjectId;
+  type: "created" | "edited" | "fulfilled" | "terminated" | "extended" | "deleted";
   title: string;
   description: string;
   user: string;
@@ -12,10 +12,10 @@ export interface IActivityLog extends Document {
 
 const activityLogSchema = new Schema<IActivityLog>(
   {
-    contractId: { type: Schema.Types.ObjectId, ref: "Contract", required: true },
+    tenderId: { type: Schema.Types.ObjectId, ref: "Contract", required: true },
     type: {
       type: String,
-      enum: ["created", "edited", "activated", "terminated", "extended", "payment", "reminder"],
+      enum: ["created", "edited", "fulfilled", "terminated", "extended", "deleted"],
       required: true,
     },
     title: { type: String, required: true },

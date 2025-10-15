@@ -60,7 +60,7 @@ export const createContract = async (req: Request, res: Response) => {
 
     // Log activity
     const log = new ActivityLog({
-      contractId: contract._id,
+      tenderId: contract._id,
       type: "created",
       title: "Contract Created",
       description: `Contract for hospital "${contract.tenderTitle}" was created.`,
@@ -114,10 +114,20 @@ export const updateContract = async (req: Request, res: Response) => {
     });
     if (!contract) return res.status(404).json({ error: "Contract not found" });
 
+    let action = "";
+
+    if(req.body.status === "active"){
+      action = "extended";
+    } else if(req.body.status === "terminated"){
+      action = req.body.status;
+    } else if(req.body.status === "expired"){
+      action = "fulfilled";
+    }
+
     // Log activity
     const log = new ActivityLog({
-      contractId: contract._id,
-      type: "edited",
+      tenderId: contract._id,
+      type: action,
       title: "Contract Updated",
       description: `Contract for hospital "${contract.tenderTitle}" was updated.`,
       user: req.body.user || "system",
@@ -139,8 +149,8 @@ export const deleteContract = async (req: Request, res: Response) => {
 
     // Log activity
     const log = new ActivityLog({
-      contractId: contract._id,
-      type: "terminated",
+      tenderId: contract._id,
+      type: "deleted",
       title: "Contract Deleted",
       description: `Contract for hospital "${contract.tenderTitle}" was deleted.`,
       user: req.body.user || "system",
