@@ -5,7 +5,11 @@ export interface IActivityLog extends Document {
   type: "created" | "edited" | "fulfilled" | "terminated" | "extended" | "deleted";
   title: string;
   description: string;
-  user: string;
+  user: {
+    name: string;
+    email: string;
+    role: string;
+  };
   timestamp: Date;
   metadata?: Record<string, any>;
 }
@@ -20,7 +24,11 @@ const activityLogSchema = new Schema<IActivityLog>(
     },
     title: { type: String, required: true },
     description: { type: String },
-    user: { type: String, required: true },
+    user: {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      role: { type: String, required: true },
+    },
     timestamp: { type: Date, default: Date.now },
     metadata: { type: Map, of: Schema.Types.Mixed },
   },

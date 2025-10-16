@@ -21,7 +21,9 @@ export const checkTenderId = async (req: Request, res: Response) => {
       query._id = { $ne: excludeId as string };
     }
 
-    const existing = await Contract.findOne(query).select("_id tenderId").lean();
+    const existing = await Contract.findOne(query)
+      .select("_id tenderId")
+      .lean();
 
     return res.status(200).json({ exists: !!existing });
   } catch (err) {
@@ -31,8 +33,18 @@ export const checkTenderId = async (req: Request, res: Response) => {
 };
 
 // CREATE CONTRACT
-export const createContract = async (req: Request, res: Response) => {
+export const createContract = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
   try {
+    console.log("Logged in User: ", req.user);
+    
+    if (!req.user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const user = req.user;
     const contractData = req.body;
     contractData.originalEndDate = contractData.endDate;
 
@@ -64,7 +76,11 @@ export const createContract = async (req: Request, res: Response) => {
       type: "created",
       title: "Contract Created",
       description: `Contract for hospital "${contract.tenderTitle}" was created.`,
-      user: req.body.user || "system", // frontend should ideally pass logged-in user
+      user: {
+        name: req.user!.name,
+        email: req.user!.email,
+        role: req.user!.role,
+      },
       timestamp: new Date(),
     });
     await log.save();
@@ -116,11 +132,11 @@ export const updateContract = async (req: Request, res: Response) => {
 
     let action = "";
 
-    if(req.body.status === "active"){
+    if (req.body.status === "active") {
       action = "extended";
-    } else if(req.body.status === "terminated"){
+    } else if (req.body.status === "terminated") {
       action = req.body.status;
-    } else if(req.body.status === "expired"){
+    } else if (req.body.status === "expired") {
       action = "fulfilled";
     }
 

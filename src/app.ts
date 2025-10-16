@@ -4,6 +4,7 @@ import cors from "cors";
 import contractRoutes from "./routes/contractRoutes";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
+import { authMiddleware } from "./middleware/authMiddleware";
 
 const app = express();
 
@@ -20,8 +21,10 @@ app.use(cookieParser());
 //Connect DB
 connectDB();
 
-//Routes
-app.use("/api/contracts", contractRoutes);
+//Private Routes
+app.use("/api/contracts", authMiddleware, contractRoutes);
+
+// Public Routes
 app.use("/api/auth", authRoutes);
 
 // Test Route
