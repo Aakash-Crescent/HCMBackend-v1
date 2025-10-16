@@ -38,13 +38,10 @@ export const createContract = async (
   res: Response
 ) => {
   try {
-    console.log("Logged in User: ", req.user);
-    
     if (!req.user) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const user = req.user;
     const contractData = req.body;
     contractData.originalEndDate = contractData.endDate;
 
@@ -74,8 +71,8 @@ export const createContract = async (
     const log = new ActivityLog({
       tenderId: contract._id,
       type: "created",
-      title: "Contract Created",
-      description: `Contract for hospital "${contract.tenderTitle}" was created.`,
+      title: "Tender Created",
+      description: `Tender - "${contract.tenderTitle}" was created.`,
       user: {
         name: req.user!.name,
         email: req.user!.email,
@@ -122,8 +119,15 @@ export const getContractById = async (req: Request, res: Response) => {
 };
 
 // UPDATE CONTRACT
-export const updateContract = async (req: Request, res: Response) => {
+export const updateContract = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
     const contract = await Contract.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -144,9 +148,13 @@ export const updateContract = async (req: Request, res: Response) => {
     const log = new ActivityLog({
       tenderId: contract._id,
       type: action,
-      title: "Contract Updated",
-      description: `Contract for hospital "${contract.tenderTitle}" was updated.`,
-      user: req.body.user || "system",
+      title: `Tender ${action}`,
+      description: `Tender "${contract.tenderTitle}" was ${action}.`,
+      user: {
+        name: req.user!.name,
+        email: req.user!.email,
+        role: req.user!.role,
+      },
       timestamp: new Date(),
     });
     await log.save();
@@ -158,8 +166,15 @@ export const updateContract = async (req: Request, res: Response) => {
 };
 
 // DELETE CONTRACT
-export const deleteContract = async (req: Request, res: Response) => {
+export const deleteContract = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
     const contract = await Contract.findByIdAndDelete(req.params.id);
     if (!contract) return res.status(404).json({ error: "Contract not found" });
 
@@ -167,9 +182,13 @@ export const deleteContract = async (req: Request, res: Response) => {
     const log = new ActivityLog({
       tenderId: contract._id,
       type: "deleted",
-      title: "Contract Deleted",
-      description: `Contract for hospital "${contract.tenderTitle}" was deleted.`,
-      user: req.body.user || "system",
+      title: "Tender Deleted",
+      description: `Tender "${contract.tenderTitle}" was deleted.`,
+      user: {
+        name: req.user!.name,
+        email: req.user!.email,
+        role: req.user!.role,
+      },
       timestamp: new Date(),
     });
     await log.save();
