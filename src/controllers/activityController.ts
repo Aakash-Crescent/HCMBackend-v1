@@ -21,8 +21,8 @@ export const getActivityLogsByTender = async (req: Request, res: Response) => {
 export const getRecentActivityLogs = async (_req: Request, res: Response) => {
   try {
     const logs = await ActivityLog.find()
-      .sort({ timestamp: -1 })
-      .limit(5)
+      .sort({ createdAt: -1 })
+      .limit(7)
       .lean();
 
     return res.status(200).json(logs);

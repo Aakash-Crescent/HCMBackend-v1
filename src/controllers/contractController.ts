@@ -107,6 +107,16 @@ export const getContracts = async (req: Request, res: Response) => {
   }
 };
 
+// GET RECENT CONTRACTS
+export const getRecentContracts = async (req: Request, res: Response) => {
+  try {
+    const recentContracts = await Contract.find().sort({ createdAt: -1 }).limit(5).lean();
+    res.json(recentContracts);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // GET CONTRACT BY ID
 export const getContractById = async (req: Request, res: Response) => {
   try {

@@ -5,13 +5,15 @@ import {
   getContractById,
   updateContract,
   deleteContract,
-  checkTenderId
+  checkTenderId,
+  getRecentContracts
 } from "../controllers/contractController";
 
 const router = Router();
 
 router.post("/", createContract);
 router.get("/", getContracts);
+router.get("/recent", getRecentContracts);
 router.get("/:id", getContractById);
 router.put("/:id", updateContract);
 router.delete("/:id", deleteContract);
