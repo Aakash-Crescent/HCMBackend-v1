@@ -107,6 +107,30 @@ export const getContracts = async (req: Request, res: Response) => {
   }
 };
 
+// GET CONTRACT COUNTS
+export const getContractCounts = async (req: Request, res: Response) => {
+  try {
+    const totalContracts = await Contract.countDocuments();
+    const draftContracts = await Contract.countDocuments({ status: "draft" });
+    const terminatedContracts = await Contract.countDocuments({ status: "terminated" });
+    const activeContracts = await Contract.countDocuments({ status: "active" });
+    const upcomingContracts = await Contract.countDocuments({ status: "upcoming" });
+    const expiredContracts = await Contract.countDocuments({ status: "expired" });
+
+    res.json({
+      total: totalContracts,
+      draft: draftContracts,
+      terminated: terminatedContracts,
+      active: activeContracts,
+      upcoming: upcomingContracts,
+      expired: expiredContracts,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 // GET RECENT CONTRACTS
 export const getRecentContracts = async (req: Request, res: Response) => {
   try {
