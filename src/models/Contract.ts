@@ -41,6 +41,7 @@ export interface IContract extends Document {
 
   // Metadata
   status: "active" | "upcoming" | "expired" | "draft" | "terminated";
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -94,6 +95,7 @@ const ContractSchema = new Schema<IContract>(
     specialTerms: { type: String },
 
     // Metadata
+    createdBy: { type: String, required: true },
     status: {
       type: String,
       enum: ["active", "upcoming", "expired", "draft", "terminated"],
