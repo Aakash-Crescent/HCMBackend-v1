@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IActivityLog extends Document {
   tenderId: mongoose.Types.ObjectId;
-  type: "created" | "edited" | "fulfilled" | "terminated" | "extended" | "deleted";
+  type: "created" | "edited" | "fulfilled" | "terminated" | "extended" | "deleted" | "activated" | "expired";
   title: string;
   description: string;
   user: {
@@ -19,7 +19,7 @@ const activityLogSchema = new Schema<IActivityLog>(
     tenderId: { type: Schema.Types.ObjectId, ref: "Contract", required: true },
     type: {
       type: String,
-      enum: ["created", "edited", "fulfilled", "terminated", "extended", "deleted"],
+      enum: ["created", "edited", "fulfilled", "terminated", "extended", "deleted", "activated", "expired"],
       required: true,
     },
     title: { type: String, required: true },

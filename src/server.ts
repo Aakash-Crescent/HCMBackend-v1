@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
-import app from "./app";
-
 dotenv.config();
+
+import app from "./app";
+import "./cron/contractStatusCron";
 
 const PORT = process.env.PORT || 5000;
 

@@ -5,7 +5,7 @@ import contractRoutes from "./routes/contractRoutes";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import { authMiddleware } from "./middleware/authMiddleware";
-import activityRoutes from "./routes/activityRoutes"
+import activityRoutes from "./routes/activityRoutes";
 
 const app = express();
 
