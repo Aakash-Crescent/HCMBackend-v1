@@ -112,10 +112,16 @@ export const getContractCounts = async (req: Request, res: Response) => {
   try {
     const totalContracts = await Contract.countDocuments();
     const draftContracts = await Contract.countDocuments({ status: "draft" });
-    const terminatedContracts = await Contract.countDocuments({ status: "terminated" });
+    const terminatedContracts = await Contract.countDocuments({
+      status: "terminated",
+    });
     const activeContracts = await Contract.countDocuments({ status: "active" });
-    const upcomingContracts = await Contract.countDocuments({ status: "upcoming" });
-    const expiredContracts = await Contract.countDocuments({ status: "expired" });
+    const upcomingContracts = await Contract.countDocuments({
+      status: "upcoming",
+    });
+    const expiredContracts = await Contract.countDocuments({
+      status: "expired",
+    });
 
     res.json({
       total: totalContracts,
@@ -130,11 +136,13 @@ export const getContractCounts = async (req: Request, res: Response) => {
   }
 };
 
-
 // GET RECENT CONTRACTS
 export const getRecentContracts = async (req: Request, res: Response) => {
   try {
-    const recentContracts = await Contract.find().sort({ createdAt: -1 }).limit(5).lean();
+    const recentContracts = await Contract.find()
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .lean();
     res.json(recentContracts);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -162,38 +170,62 @@ export const updateContract = async (
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const contract = await Contract.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!contract) return res.status(404).json({ error: "Contract not found" });
-
-    let action = "";
-
-    if (req.body.status === "active") {
-      action = "extended";
-    } else if (req.body.status === "terminated") {
-      action = req.body.status;
-    } else if (req.body.status === "expired") {
-      action = "fulfilled";
+    // Fetch the existing contract first
+    const existingContract = await Contract.findById(req.params.id);
+    if (!existingContract) {
+      return res.status(404).json({ error: "Contract not found" });
     }
 
-    // Log activity
+    // Perform the update
+    const updatedContract = await Contract.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    let action = "edited"; // default
+
+    // ✅ 1. Check if status changed
+    if (req.body.status && req.body.status !== existingContract.status) {
+      switch (req.body.status) {
+        case "active":
+          action = "extended";
+          break;
+        case "terminated":
+          action = "terminated";
+          break;
+        case "expired":
+          action = "fulfilled";
+          break;
+      }
+    }
+    // ✅ 2. If status didn't change, but endDate increased → extended
+    else if (
+      req.body.endDate &&
+      new Date(req.body.endDate) > new Date(existingContract.endDate)
+    ) {
+      action = "extended";
+    }
+
+    // ✅ 3. Otherwise → edited (default)
+
+    // Log the activity
     const log = new ActivityLog({
-      tenderId: contract._id,
+      tenderId: updatedContract!._id,
       type: action,
       title: `Tender ${action}`,
-      description: `Tender "${contract.tenderTitle}" was ${action}.`,
+      description: `Tender "${updatedContract!.tenderTitle}" was ${action}.`,
       user: {
-        name: req.user!.name,
-        email: req.user!.email,
-        role: req.user!.role,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
       },
       timestamp: new Date(),
     });
+
     await log.save();
 
-    res.json(contract);
+    res.json(updatedContract);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
